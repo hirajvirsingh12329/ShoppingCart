@@ -1,0 +1,34 @@
+
+.error {
+  margin-top: 10px; /* Adjust pixels, rem, or % as needed */
+}
+
+
+
+.container {
+display: flex;
+  align-items: center; /* Vertically centers the content */
+  justify-content: center; /* Horizontally centers the content */
+  min-height: 100dvh; /* Takes full screen height dynamically */
+}
+
+
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(255, 255, 255, 0.7); /* Semitransparent background overlay */
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically */
+  z-index: 9999;           /* Keeps it on top of all other elements */
+}
+
+.loader-image {
+  width: 80px;            /* Adjust dimensions to fit your specific GIF/image */
+  height: 80px;
+}
+
+

@@ -1,0 +1,15 @@
+<div class="cart-status">
+      <h2>Your Cart ({{ cartService.totalItems() }} items)</h2>
+      
+      <ul>
+        @for (item of cartService.items(); track $index) {
+          <li>{{ item }}</li>
+        } @empty {
+          <li>Your cart is empty.</li>
+        }
+      </ul>
+
+      @if (cartService.totalItems() > 0) {
+        <button (click)="cartService.clearCart()">Clear All</button>
+      }
+    </div>

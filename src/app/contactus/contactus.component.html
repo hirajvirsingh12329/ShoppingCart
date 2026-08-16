@@ -1,0 +1,36 @@
+<div>
+  <button type="button" (click)="UpdateCities()">Get Cities</button>
+</div>
+<div>
+  <div *ngFor="let city of cities()">
+    {{ city }}
+  </div>
+</div>
+<div>
+  <br>
+
+  <div class="container">
+    <!-- Trigger Buttons -->
+    <button (click)="toggleSidebar()">
+      {{ isSidebarOpen() ? 'Close' : 'Open' }} Sidebar
+    </button>
+
+    <button (click)="toggleAlert()">Toggle Alert Box</button>
+
+    <!-- Conditional UI Elements (Call the signal as a function to read it) -->
+    <aside *ngIf="isSidebarOpen()" class="sidebar">
+      <h3>Sidebar Navigation</h3>
+      <p>This panel toggles smoothly using Angular Signals.</p>
+    </aside>
+
+    <div *ngIf="showAlert()" class="alert-box">
+      <p>⚠️ Important warning message!</p>
+    </div>
+  </div>
+
+</div>
+<div>
+  <br>
+  <app-signal-comp-two></app-signal-comp-two>
+  <app-singal-comp-one></app-singal-comp-one>
+</div>

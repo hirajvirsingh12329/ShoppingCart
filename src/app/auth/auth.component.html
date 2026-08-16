@@ -1,0 +1,34 @@
+<div class="container-fluid d-flex justify-content-center align-items-center vh-100 bg-light ">
+
+  <app-loader></app-loader>
+  <!-- 
+      <div class="loader-overlay" *ngIf="isLoading">
+        <img src="assets/images/loader.gif" alt="Loading data..."  class="loader-image" />        
+      </div>
+      -->
+
+  <div class="card shadow col-5 ">
+    <div class="card-header">
+      <h3>Login</h3>
+    </div>
+    <div class="card-body">
+      <form #LoginForm="ngForm" (ngSubmit)="login()">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input [(ngModel)]="email" class="form-control" required name="username" class="form-control" />
+          <label class="form-label">Password</label>
+          <input [(ngModel)]="password" required class="form-control" name="password" type="password"
+            showErrorIcon="initial" />
+
+          <div *ngIf="!isValidUser">
+            <div class="alert alert-danger error" role="alert">
+              {{ errorMessage }}</div>
+          </div>
+          <div class="text-center">
+            <button type="submit"  class="btn btn-primary w-25 mt-2">Login</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

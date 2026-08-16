@@ -1,0 +1,66 @@
+/* Layout Container */
+.mat-elevation-z8 {
+  margin: 20px;
+  border-radius: 8px;
+  overflow: hidden; /* Prevents sharp table corners breaking round box borders */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Filter Input Styling */
+mat-form-field {
+  width: calc(100% - 40px);
+  margin: 20px 20px 10px 20px;
+  display: block;
+}
+
+/* Full Width Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Header Cells Layout */
+th.mat-header-cell {
+  background-color: #f5f7fa;
+  color: #333333;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 16px !important;
+}
+
+/* Data Cells Layout */
+td.mat-cell {
+  font-size: 14px;
+  color: #4a5568;
+  padding: 16px !important;
+  border-bottom: 1px solid #edf2f7;
+}
+
+/* Alternating Row Background Color (Improves Readability) */
+tr.mat-row:nth-child(even) {
+  background-color: #fafbfc;
+}
+
+/* Row Hover States */
+tr.mat-row:hover {
+  background-color: #f1f5f9;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* "No Matching Data" Empty State Row */
+tr.mat-row.mat-no-data-row {
+  text-align: center;
+  font-style: italic;
+  background-color: #ffffff;
+}
+
+tr.mat-no-data-row td {
+  padding: 32px !important;
+  color: #a0aec0;
+}
+
+/* Paginator Integration */
+mat-paginator {
+  background-color: #ffffff;
+  border-top: 1px solid #edf2f7;
+}

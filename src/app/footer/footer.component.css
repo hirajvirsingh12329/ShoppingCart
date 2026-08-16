@@ -1,0 +1,8 @@
+/* Footer styling */
+.app-footer {
+  flex-shrink: 0; /* Prevents footer from flattening */
+  background-color: #111827;
+  color: #9ca3af;
+  text-align: center;  
+  font-size: 0.875rem;
+}
