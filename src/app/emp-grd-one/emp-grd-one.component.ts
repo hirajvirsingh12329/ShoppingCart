@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient,HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Employee } from '../Models/interfaces';
 import { CommonSevice } from '../Services/common.service'
+
 
 @Component({
   selector: 'app-emp-grd-one',
@@ -13,29 +14,29 @@ import { CommonSevice } from '../Services/common.service'
   styleUrl: './emp-grd-one.component.css'
 })
 export class EmpGrdOneComponent {
-// Master API storage arrays
-  allEmployees: Employee[] = [];
+  // Master data
+  employees: Employee[] = [];
+
+  // Filter and Pagination state
   filteredEmployees: Employee[] = [];
-  pagedEmployees: Employee[] = [];
-
-  // Search, Sort and Page Tracking configurations
-  searchTerm: string = '';
-  sortColumn: keyof Employee | '' = '';
-  sortAscending: boolean = true;
-  
+  searchText: string = '';
   currentPage: number = 1;
-  pageSize: number = 5; // Rows shown per page
-  totalPages: number = 1;
+  pageSize: number = 5;
+  pageSizeOptions: number[] = [2, 5, 10, 15];
 
-  // Track the active row ID being edited along with a clone of its values
+  // Track editing row
   editingEmpId: string | null = null;
-  editingRowCopy: Employee | null = null;
+  editCache: any = {};
 
-  constructor(private http: HttpClient,private CommonSevice: CommonSevice) {}
-
+  constructor(private CommonSevice: CommonSevice) {
+    // Initialize data source with an empty array to prevent template errors before API resolves
+  }
   ngOnInit(): void {
     this.fetchEmployeeData();
+   // this.loadMockData();
+    this.applyFilter();
   }
+
 
   // 1. Get Data from API
   fetchEmployeeData(): void {
@@ -43,104 +44,111 @@ export class EmpGrdOneComponent {
     this.CommonSevice.getEmployees()
       .subscribe({
         next: (data) => {
-          this.allEmployees = data;
-          this.applyFilterAndPagination();
+          this.employees = data;    
+          this.filteredEmployees = data;           
         },
         error: (err) => console.error('Error fetching grid data:', err)
       });
   }
 
-  // 2. Filter, Sort, and Chunk Data for view
-  applyFilterAndPagination(): void {
-    // A. Apply Search Filter across all row string parameters
-    let result = [...this.allEmployees];
-    if (this.searchTerm.trim()) {
-      const term = this.searchTerm.toLowerCase();
-      result = result.filter(emp => 
-        emp.firstname.toLowerCase().includes(term) ||
-        emp.lastname.toLowerCase().includes(term) ||
-        emp.gender.toLowerCase().includes(term) ||
-        emp.address.toLowerCase().includes(term) ||
-        emp.pincode.includes(term)
-      );
-    }
-
-    // B. Apply Sort Matrix
-    if (this.sortColumn) {
-      result.sort((a, b) => {
-        const valA = a[this.sortColumn as keyof Employee];
-        const valB = b[this.sortColumn as keyof Employee];
-
-        if (valA < valB) return this.sortAscending ? -1 : 1;
-        if (valA > valB) return this.sortAscending ? 1 : -1;
-        return 0;
+  /*
+loadMockData(): void {
+    // Generates mock data for testing pagination
+    const countries = ['India', 'USA', 'UK', 'Canada'];
+    const cities = ['New Delhi', 'New York', 'London', 'Toronto'];
+    
+    for (let i = 1; i <= 25; i++) {
+      this.employees.push({
+        empId: `EMP00${i}`,
+        firstname: `John${i}`,
+        lastname: `Doe${i}`,
+        country: countries[i % countries.length],
+        city: cities[i % cities.length],
+        gender: i % 2 === 0 ? 'Male' : 'Female',
+        pincode: `11000${i}`,
+        married: i % 3 === 0,
+        dateOfBirth: new Date(1990 + (i % 10), i % 12, i % 28),
+        address: `${i}23, Baker Street`
       });
     }
-
-    // C. Calculate Pagination bounds
-    this.filteredEmployees = result;
-    this.totalPages = Math.ceil(this.filteredEmployees.length / this.pageSize) || 1;
-    
-    // Safety check for page limits
-    if (this.currentPage > this.totalPages) {
-      this.currentPage = this.totalPages;
-    }
-
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    this.pagedEmployees = this.filteredEmployees.slice(startIndex, startIndex + this.pageSize);
   }
+*/
 
-  // 3. User Trigger Actions
-  onSearch(): void {
-    this.currentPage = 1; // Reset to page 1 during new query searches
-    this.applyFilterAndPagination();
-  }
-
-  onSort(column: keyof Employee): void {
-    if (this.sortColumn === column) {
-      this.sortAscending = !this.sortAscending;
+  // Filter logic
+  applyFilter(): void {
+    if (!this.searchText) {
+      this.filteredEmployees = [...this.employees];     
     } else {
-      this.sortColumn = column;
-      this.sortAscending = true;
+      const search = this.searchText.toLowerCase();
+      this.filteredEmployees = this.employees.filter(emp =>
+        emp.firstname.toLowerCase().includes(search) ||
+        emp.lastname.toLowerCase().includes(search) ||
+        emp.city.toLowerCase().includes(search) 
+      );
     }
-    this.applyFilterAndPagination();
+    this.currentPage = 1; // Reset to page 1 on filter change
   }
 
-  changePage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.applyFilterAndPagination();
+  // Pagination getters
+  get totalPages(): number {
+    return Math.ceil(this.filteredEmployees.length / this.pageSize) || 1;
+  }
+
+  get pagedEmployees(): Employee[] {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    return this.filteredEmployees.slice(startIndex, startIndex + this.pageSize);
+  }
+
+  // Pagination navigation
+  onPageSizeChange(): void {
+    this.currentPage = 1;
+   const startIndex = (this.currentPage - 1) * this.pageSize;
+    this.filteredEmployees.slice(startIndex, startIndex + this.pageSize);
+  }
+
+  prevPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
     }
   }
 
-  // 4. Inline Row CRUD Editing Management
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  // Inline Edit CRUD actions
   startEdit(employee: Employee): void {
     this.editingEmpId = employee.empId;
-    this.editingRowCopy = { ...employee }; // Clone deep copy object 
+    // Deep clone row for independent cancellation
+    this.editCache = { ...employee };
+  }
+
+  saveEdit(index: number): void {
+    const globalIndex = this.employees.findIndex(e => e.empId === this.editingEmpId);
+    if (globalIndex !== -1) {
+      this.employees[globalIndex] = { ...this.editCache };
+      this.applyFilter();
+    }
+    this.editingEmpId = null;
   }
 
   cancelEdit(): void {
     this.editingEmpId = null;
-    this.editingRowCopy = null;
+    this.editCache = {};
   }
 
-  saveEdit(): void {
-    if (!this.editingRowCopy) return;
-
-    const index = this.allEmployees.findIndex(e => e.empId === this.editingRowCopy?.empId);
-    if (index !== -1) {
-      // Optimistically update the UI model
-      this.allEmployees[index] = { ...this.editingRowCopy };
-      
-      // Send backend API save transaction
-      console.log('Sending saved updates to your PUT endpoint:', this.editingRowCopy);
-      /*
-      this.http.put(`https://example.com/${this.editingRowCopy.empId}`, this.editingRowCopy)
-        .subscribe(() => this.fetchEmployeeData());
-      */
-      
-      this.cancelEdit();
-      this.applyFilterAndPagination();
+  // Delete Action
+  deleteEmployee(empId: string): void {
+    if (confirm('Are you sure you want to delete this employee?')) {
+      this.employees = this.employees.filter(e => e.empId !== empId);
+      this.applyFilter();
+      // Adjust current page if last item on page is deleted
+      if (this.currentPage > this.totalPages) {
+        this.currentPage = this.totalPages;
+      }
     }
   }
+
 }

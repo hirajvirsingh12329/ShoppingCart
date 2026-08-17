@@ -1,92 +1,120 @@
-<div class="custom-grid-wrapper">
-  
-  <!-- Global Search Action Bar Module -->
-  <div class="table-toolbar">
+<div class="grid-container">
+  <!-- Top Toolbar -->
+  <div class="toolbar">
     <input 
       type="text" 
-      placeholder="Search employees..." 
-      [(ngModel)]="searchTerm" 
-      (input)="onSearch()" 
-      class="search-input"
-    />
+      placeholder="Search items..." 
+      [(ngModel)]="searchText" 
+      (ngModelChange)="applyFilter()"
+      class="search-input" />
+      
+    <div class="per-page">
+      <label>Items per page:</label>
+      <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+        <option *ngFor="let opt of pageSizeOptions" [value]="opt">{{ opt }}</option>
+      </select>
+    </div>
   </div>
 
-  <!-- Custom Core HTML Table Frame -->
-  <div class="table-responsive">
+  <!-- Data Grid Table -->
+  <div class="table-wrapper">
     <table class="custom-table">
       <thead>
         <tr>
-          <th (click)="onSort('empId')">Emp ID <span class="sort-icon">{{ sortColumn === 'empId' ? (sortAscending ? '▲' : '▼') : '↕' }}</span></th>
-          <th (click)="onSort('firstname')">First Name <span class="sort-icon">{{ sortColumn === 'firstname' ? (sortAscending ? '▲' : '▼') : '↕' }}</span></th>
-          <th (click)="onSort('lastname')">Last Name <span class="sort-icon">{{ sortColumn === 'lastname' ? (sortAscending ? '▲' : '▼') : '↕' }}</span></th>
-          <th (click)="onSort('gender')">Gender <span class="sort-icon">{{ sortColumn === 'gender' ? (sortAscending ? '▲' : '▼') : '↕' }}</span></th>
-          <th (click)="onSort('dateOfBirth')">DOB <span class="sort-icon">{{ sortColumn === 'dateOfBirth' ? (sortAscending ? '▲' : '▼') : '↕' }}</span></th>
-          <th (click)="onSort('married')">Married <span class="sort-icon">{{ sortColumn === 'married' ? (sortAscending ? '▲' : '▼') : '↕' }}</span></th>
+          <th>Emp ID</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Gender</th>
+          <th>Country</th>
+          <th>City</th>
           <th>Pincode</th>
-          <th>Address</th>
-          <th class="actions-header">Actions</th>
+          <th>Married</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let emp of pagedEmployees">
-          
-          <!-- Static Mode View Row Data Template -->
-          <ng-container *ngIf="editingEmpId !== emp.empId">
-            <td>{{ emp.empId }}</td>
-            <td>{{ emp.firstname }}</td>
-            <td>{{ emp.lastname }}</td>
-            <td>{{ emp.gender }}</td>
-            <td>{{ emp.dateOfBirth | date:'mediumDate' }}</td>
-            <td>{{ emp.married ? 'Yes' : 'No' }}</td>
-            <td>{{ emp.pincode }}</td>
-            <td class="cell-address">{{ emp.address }}</td>
-            <td>
+        <tr *ngFor="let emp of filteredEmployees; let i = index">
+          <!-- ID -->
+          <td>{{ emp.empId }}</td>
+
+          <!-- First Name -->
+          <td>
+            <span *ngIf="editingEmpId !== emp.empId">{{ emp.firstname }}</span>
+            <input *ngIf="editingEmpId === emp.empId" type="text" [(ngModel)]="editCache.firstname" />
+          </td>
+
+          <!-- Last Name -->
+          <td>
+            <span *ngIf="editingEmpId !== emp.empId">{{ emp.lastname }}</span>
+            <input *ngIf="editingEmpId === emp.empId" type="text" [(ngModel)]="editCache.lastname" />
+          </td>
+
+          <!-- Gender -->
+          <td>
+            <span *ngIf="editingEmpId !== emp.empId">{{ emp.gender }}</span>
+            <select *ngIf="editingEmpId === emp.empId" [(ngModel)]="editCache.gender">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </td>
+
+          <!-- Country -->
+          <td>
+            <span *ngIf="editingEmpId !== emp.empId">{{ emp.country }}</span>
+            <input *ngIf="editingEmpId === emp.empId" type="text" [(ngModel)]="editCache.country" />
+          </td>
+
+          <!-- City -->
+          <td>
+            <span *ngIf="editingEmpId !== emp.empId">{{ emp.city }}</span>
+            <input *ngIf="editingEmpId === emp.empId" type="text" [(ngModel)]="editCache.city" />
+          </td>
+
+          <!-- Pincode -->
+          <td>
+            <span *ngIf="editingEmpId !== emp.empId">{{ emp.pincode }}</span>
+            <input *ngIf="editingEmpId === emp.empId" type="text" [(ngModel)]="editCache.pincode" />
+          </td>
+
+          <!-- Married Status -->
+          <td>
+            <span *ngIf="editingEmpId !== emp.empId">{{ emp.married ? 'Yes' : 'No' }}</span>
+            <input *ngIf="editingEmpId === emp.empId" type="checkbox" [(ngModel)]="editCache.married" />
+          </td>
+
+          <!-- Actions Column -->
+          <td>
+            <div *ngIf="editingEmpId !== emp.empId" class="action-buttons">
               <button class="btn btn-edit" (click)="startEdit(emp)">Edit</button>
-            </td>
-          </ng-container>
-
-          <!-- Dynamic Active Inline Row Form Editor Template -->
-          <ng-container *ngIf="editingEmpId === emp.empId && editingRowCopy">
-            <td>{{ editingRowCopy.empId }}</td>
-            <td><input type="text" [(ngModel)]="editingRowCopy.firstname" class="edit-input" /></td>
-            <td><input type="text" [(ngModel)]="editingRowCopy.lastname" class="edit-input" /></td>
-            <td>
-              <select [(ngModel)]="editingRowCopy.gender" class="edit-input">
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
-            </td>
-            <td><input type="date" [(ngModel)]="editingRowCopy.dateOfBirth" class="edit-input" /></td>
-            <td><input type="checkbox" [(ngModel)]="editingRowCopy.married" /></td>
-            <td><input type="text" [(ngModel)]="editingRowCopy.pincode" class="edit-input" /></td>
-            <td><textarea [(ngModel)]="editingRowCopy.address" class="edit-input row-textarea"></textarea></td>
-            <td class="action-cell-buttons">
-              <button class="btn btn-save" (click)="saveEdit()">Save</button>
+              <button class="btn btn-delete" (click)="deleteEmployee(emp.empId)">Delete</button>
+            </div>
+            <div *ngIf="editingEmpId === emp.empId" class="action-buttons">
+              <button class="btn btn-save" (click)="saveEdit(i)">Save</button>
               <button class="btn btn-cancel" (click)="cancelEdit()">Cancel</button>
-            </td>
-          </ng-container>
-
+            </div>
+          </td>
         </tr>
-        <!-- Empty Results Template Fallback Status -->
+        
+        <!-- Empty State Handling -->
         <tr *ngIf="pagedEmployees.length === 0">
-          <td colspan="9" class="no-data-cell">No matching employee records discovered.</td>
+          <td colspan="9" class="no-data">No employees found.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <!-- Traditional Context Pagination Footer Engine -->
-  <div class="pagination-footer">
-    <div class="pagination-info">
-      Showing Page <strong>{{ currentPage }}</strong> of {{ totalPages }} (Total entries: {{ filteredEmployees.length }})
-    </div>
-    <div class="pagination-controls">
-      <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(1)">«</button>
-      <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">‹</button>
-      <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">›</button>
-      <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(totalPages)">»</button>
-    </div>
+  <!-- Bottom Pagination Controls -->
+  <div class="pagination">
+    <button class="nav-btn" (click)="prevPage()" [disabled]="currentPage === 1">
+      &#10094; <!-- Left Arrow Icon -->
+    </button>
+    
+    <span class="page-indicator">
+      Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong>
+    </span>
+    
+    <button class="nav-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+      &#10095; <!-- Right Arrow Icon -->
+    </button>
   </div>
-
 </div>
