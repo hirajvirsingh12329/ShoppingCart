@@ -6,6 +6,7 @@ import { HomeComponent } from './home/home.component';
 import { ContactusComponent } from './contactus/contactus.component';
 import { TemplateRegistrationComponent } from '../app/forms/template-form/template-form.component';
 import { EmpGrdOneComponent } from './emp-grd-one/emp-grd-one.component';
+import { ReactiveFormComponent } from './forms/reactive-form/reactive-form.component';
 
 export const routes: Routes = [
 
@@ -19,7 +20,9 @@ export const routes: Routes = [
             { path: 'employee', component: EmpGrdOneComponent },
             { path: 'product', component: MybrandComponent },
             { path: 'mybrand', component: MybrandComponent },
-            { path: 'registration', component: TemplateRegistrationComponent }
+            { path: 'registration', component: TemplateRegistrationComponent },
+            { path: 'reactive', component: ReactiveFormComponent }
+            
         ]
     },
 

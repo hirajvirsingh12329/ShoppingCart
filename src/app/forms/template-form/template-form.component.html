@@ -1,21 +1,26 @@
 <div class="mt-1">
-    @if (!errorMessage) {
-    <p><strong>{{ errorMessage }}</strong></p>
-    }
+    
+    <p style="text-align: center; vertical-align:middle;"><strong>Template Form</strong></p>
+    
     <form class="shadow rounded-2 p-2" style="background-color:lightgray" #templateRegistrationForm="ngForm"
         (ngSubmit)="onSubmit()">
         <div class="row ">
             <div class="form-group col-6">
                 <label class="form-label">First Name</label>
-                <input type="text" class="form-control" name="firstname" ngModel placeholder="Firstname"  ngModel
-                    required                                      
-                >
-            </div>
-           
-                <div class=" form-group col-6">
-                    <label class="form-label">Last Name</label>
-                    <input type="text" class="form-control" name="lastname" ngModel placeholder="Last Name">
+                <input type="text" class="form-control" name="firstname" ngModel placeholder="Firstname"
+                    #firstName="ngModel" pattern="^[a-zA-Z0-9]+$" required>
+                <!-- Validation Error Messages -->
+                <div *ngIf="(firstName.touched || templateRegistrationForm.submitted) && firstName.invalid" class="error-msg">
+                    <small *ngIf="firstName.errors?.['required']">First Name is required.</small>
+                    <small *ngIf="firstName.errors?.['pattern']">Only alphanumeric values (letters and numbers) are
+                        allowed.</small>
                 </div>
+            </div>
+
+            <div class=" form-group col-6">
+                <label class="form-label">Last Name</label>
+                <input type="text" class="form-control" name="lastname" ngModel placeholder="Last Name">
+            </div>
         </div>
         <div class="row">
             <div class="form-group col-6">
@@ -70,7 +75,9 @@
             </div>
         </div>
         <div class="row col-12 d-flex justify-content-center align-items-center" style="min-height: 100px;">
-            <button type="submit" class="btn btn-primary" style="width: 100px;">Submit</button>
+            <!-- The Save button is disabled if the form is invalid -->
+            <button type="submit" [disabled]="templateRegistrationForm.invalid" class="btn btn-primary"
+                style="width: 100px;">Submit</button>
             <button type="button" class="btn btn-secondary" (click)="onReset(templateRegistrationForm)"
                 style="width: 130px;margin-left: 5px;">Reset Form</button>
         </div>

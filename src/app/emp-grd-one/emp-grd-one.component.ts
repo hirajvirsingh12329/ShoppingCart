@@ -111,7 +111,6 @@ loadMockData(): void {
       this.currentPage--;
     }
   }
-
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;

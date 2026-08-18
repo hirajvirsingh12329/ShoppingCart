@@ -1,1 +1,72 @@
-<p>reactive-form works!</p>
+<div class="mt-1">
+<p style="text-align: center; vertical-align:middle;"><strong>Reactive Form</strong></p>
+    <form class="shadow rounded-2 p-2" style="background-color:lightgray">
+        <div class="row ">
+            <div class="form-group col-6">
+                <label class="form-label">First Name</label>
+                <input type="text" class="form-control" name="firstname">
+            </div>
+
+            <div class=" form-group col-6">
+                <label class="form-label">Last Name</label>
+                <input type="text" class="form-control" name="lastname" placeholder="Last Name">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-6">
+                <label class="form-label">Country</label>
+                <select class="form-select"  name="country">
+                    <option selected value="">-- Select a Country --</option>
+                    <option >
+                        {{'India'}}
+                    </option>
+                </select>
+            </div>
+            <div class="form-group col-6">
+                <label class="form-label">City</label>
+                <select class="form-select" name="city">
+                    <option selected value="">-- Select a city --</option>
+                    <option>
+                        {{'Delhi'}}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-6">
+                <label class="form-label">Gender</label>
+                <input type="text" class="form-control" name="gender" placeholder="">
+            </div>
+            <div class="form-group col-6">
+                <label class="form-label">Pincode</label>
+                <input type="text" class="form-control" name="pincode" placeholder="Pin code">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-6">
+                <div>
+                    <label class="form-check-label">Married</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="married" class="form-check-input" >
+                </div>
+            </div>
+            <div class="form-group col-6">
+                <label class="form-label">Date of birth</label>
+                <input type="date" class="form-control" name="dateOfBirth"  max="2026-07-27">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-12">
+                <label class="form-label">Address</label>
+                <textarea type="text" class="form-control" name="address"  rows="4" placeholder=""></textarea>
+            </div>
+        </div>
+        <div class="row col-12 d-flex justify-content-center align-items-center" style="min-height: 100px;">
+            <!-- The Save button is disabled if the form is invalid -->
+            <button type="submit"  class="btn btn-primary"
+                style="width: 100px;">Submit</button>
+            <button type="button" class="btn btn-secondary" style="width: 130px;margin-left: 5px;">Reset Form</button>
+        </div>
+    </form>
+</div>

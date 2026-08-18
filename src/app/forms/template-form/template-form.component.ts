@@ -38,7 +38,7 @@ export class TemplateRegistrationComponent implements OnInit {
     married: false,
     dateOfBirth: new Date(),
     address: '',
-    empId:''
+    empId: ''
   };
 
   @ViewChild('templateRegistrationForm') form!: NgForm;
@@ -49,15 +49,16 @@ export class TemplateRegistrationComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchApiContries();
-    this.fetchApiCities();    
-   // this.GetEmployee();
+    this.fetchApiCities();
+    // this.GetEmployee();
   }
 
   // Reads and processes the submitted control values
   onSubmit(): void {
-    //if (form.valid) {
-    // Subscribing triggers the actual API POST
-
+     if (this.form.invalid) {
+      console.log('Form is invalid. Cannot save data.');
+      return;
+    }
 
     this.employee = {
       firstname: this.form.value.firstname,
@@ -69,9 +70,7 @@ export class TemplateRegistrationComponent implements OnInit {
       married: this.form.value.marriedCheckBox,
       dateOfBirth: this.form.value.dateOfBirth,
       address: this.form.value.address,
-      empId:''
-
-
+      empId: '21'
     };
 
 
@@ -84,11 +83,6 @@ export class TemplateRegistrationComponent implements OnInit {
         console.error('Error saving data:', error);
       }
     });
-
-
-    // Reading individual control values explicitly
-
-    //}
   }
 
   onCountryChange(): void {
@@ -103,7 +97,7 @@ export class TemplateRegistrationComponent implements OnInit {
         if (!response || response.length === 0) {
           this.errorMessage = 'No data available from the server.';
         } else {
-          this.cities = response;          
+          this.cities = response;
           this.errorMessage = "no error"; // Clear previous errors
         }
       },
@@ -133,8 +127,8 @@ export class TemplateRegistrationComponent implements OnInit {
     // 3. Fetch data and assign it inside the subscribe block
     this.CommonSevice.getEmployee('1').subscribe({
       next: (data: any) => {
-        this.selectedCountryCode = data.country;      
-        this.filtercities = this.cities.filter((city => city.countryCode === data.country.trim()));  
+        this.selectedCountryCode = data.country;
+        this.filtercities = this.cities.filter((city => city.countryCode === data.country.trim()));
         this.employee = {
           firstname: data.firstname,
           lastname: data.lastname,
@@ -145,7 +139,7 @@ export class TemplateRegistrationComponent implements OnInit {
           married: data.married,
           dateOfBirth: data.dateOfBirth,
           address: data.address,
-          empId:''
+          empId: ''
 
         };
 
@@ -158,13 +152,13 @@ export class TemplateRegistrationComponent implements OnInit {
     });
 
   }
-onReset(form: NgForm) {
+  onReset(form: NgForm) {
     // 3. Clear the form when the user clicks the reset button
-    this.form.resetForm(); 
+    this.form.resetForm();
+    this.fetchApiContries();
+    this.fetchApiCities();
   }
   ValidateFrom(): void {
-
-
   }
 
 }
