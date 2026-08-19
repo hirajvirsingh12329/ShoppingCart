@@ -109,3 +109,68 @@
   font-size: 14px;
   color: #444;
 }
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+th.sortable:hover {
+  background-color: rgba(0, 0, 0, 0.05); /* Slight highlight on hover */
+}
+
+/* Dialog Layout Containers */
+.modal-dialog {
+  border: none;
+  border-radius: 8px;
+  padding: 24px;
+  width: 450px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Background overlay backdrop color styling */
+.modal-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.modal-header h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+/* Form Item Flex Configurations */
+.modal-body .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+}
+
+.modal-body label {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.modal-body input[type="text"],
+.modal-body select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.modal-body .checkbox-group {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}

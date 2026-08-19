@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component ,ElementRef,ViewChild} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Employee } from '../Models/interfaces';
 import { CommonSevice } from '../Services/common.service'
+import * as XLSX from 'xlsx';
 
 
 @Component({
@@ -22,18 +23,23 @@ export class EmpGrdOneComponent {
   searchText: string = '';
   currentPage: number = 1;
   pageSize: number = 5;
-  pageSizeOptions: number[] = [2, 5, 10, 15];
+  pageSizeOptions: number[] = [5, 10, 15];
 
   // Track editing row
   editingEmpId: string | null = null;
   editCache: any = {};
+
+  sortKey: string = '';
+  isAscending: boolean = true;
+
+  @ViewChild('editDialog') editDialog!: ElementRef<HTMLDialogElement>;
 
   constructor(private CommonSevice: CommonSevice) {
     // Initialize data source with an empty array to prevent template errors before API resolves
   }
   ngOnInit(): void {
     this.fetchEmployeeData();
-   // this.loadMockData();
+    // this.loadMockData();
     this.applyFilter();
   }
 
@@ -44,8 +50,12 @@ export class EmpGrdOneComponent {
     this.CommonSevice.getEmployees()
       .subscribe({
         next: (data) => {
-          this.employees = data;    
-          this.filteredEmployees = data;           
+          this.employees = data;
+          this.filteredEmployees = data;
+          const startIndex = (this.currentPage - 1) * this.pageSize;
+          this.filteredEmployees = this.employees.slice(startIndex, startIndex + this.pageSize);
+          this.sort('empId'); // Default sort by empId on initial load
+
         },
         error: (err) => console.error('Error fetching grid data:', err)
       });
@@ -77,13 +87,13 @@ loadMockData(): void {
   // Filter logic
   applyFilter(): void {
     if (!this.searchText) {
-      this.filteredEmployees = [...this.employees];     
+      this.filteredEmployees = [...this.employees];
     } else {
       const search = this.searchText.toLowerCase();
       this.filteredEmployees = this.employees.filter(emp =>
         emp.firstname.toLowerCase().includes(search) ||
         emp.lastname.toLowerCase().includes(search) ||
-        emp.city.toLowerCase().includes(search) 
+        emp.city.toLowerCase().includes(search)
       );
     }
     this.currentPage = 1; // Reset to page 1 on filter change
@@ -91,30 +101,41 @@ loadMockData(): void {
 
   // Pagination getters
   get totalPages(): number {
-    return Math.ceil(this.filteredEmployees.length / this.pageSize) || 1;
+    console.log(this.employees.length / this.pageSize);
+    return Math.ceil(this.employees.length / this.pageSize) || 1;
   }
 
   get pagedEmployees(): Employee[] {
     const startIndex = (this.currentPage - 1) * this.pageSize;
-    return this.filteredEmployees.slice(startIndex, startIndex + this.pageSize);
+    return this.employees.slice(startIndex, startIndex + this.pageSize);
   }
 
   // Pagination navigation
   onPageSizeChange(): void {
     this.currentPage = 1;
-   const startIndex = (this.currentPage - 1) * this.pageSize;
-    this.filteredEmployees.slice(startIndex, startIndex + this.pageSize);
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    this.filteredEmployees = this.employees.slice(startIndex, startIndex + this.pageSize);
   }
 
   prevPage(): void {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    this.filteredEmployees = this.employees.slice(startIndex, startIndex + this.pageSize);
     if (this.currentPage > 1) {
       this.currentPage--;
     }
+    else {
+      this.currentPage = 0;
+    }
+
   }
   nextPage(): void {
+
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
     }
+
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    this.filteredEmployees = this.employees.slice(startIndex, startIndex + this.pageSize);
   }
 
   // Inline Edit CRUD actions
@@ -149,5 +170,45 @@ loadMockData(): void {
       }
     }
   }
+  sort(key: string): void {
+    // If clicking the same column, toggle direction. If new column, default to ascending.
+    if (this.sortKey === key) {
+      this.isAscending = !this.isAscending;
+    } else {
+      this.sortKey = key;
+      this.isAscending = true;
+    }
+
+    // Basic array sort execution
+    this.filteredEmployees.sort((a: any, b: any) => {
+      if (a[key] < b[key]) return this.isAscending ? -1 : 1;
+      if (a[key] > b[key]) return this.isAscending ? 1 : -1;
+      return 0;
+    });
+  }
+  downloadTable(): void {
+    // 1. Map dataset to structured key-value pairs (Filters out sorting icons and action cells)
+    const dataToExport = this.filteredEmployees.map(emp => ({
+      'Emp ID': emp.empId,
+      'First Name': emp.firstname,
+      'Last Name': emp.lastname,
+      'Gender': emp.gender,
+      'Country': emp.country,
+      'City': emp.city,
+      'Pincode': emp.pincode,
+      'Married': emp.married ? 'Yes' : 'No' // Translates true/false boolean explicitly
+    }));
+
+    // 2. Turn transformed data into an Excel worksheet object
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataToExport);
+
+    // 3. Form a fresh workbook and append our worksheet
+    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Employee Data');
+
+    // 4. Trigger download directly natively inside modern browsers
+    XLSX.writeFile(workbook, 'Employee_Records.xlsx');
+  }
+  
 
 }
