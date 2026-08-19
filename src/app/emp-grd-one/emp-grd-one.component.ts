@@ -43,7 +43,6 @@ export class EmpGrdOneComponent {
     this.applyFilter();
   }
 
-
   // 1. Get Data from API
   fetchEmployeeData(): void {
     // Replace with your real microservice API endpoint URL
