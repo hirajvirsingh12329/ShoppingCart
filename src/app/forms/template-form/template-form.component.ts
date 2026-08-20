@@ -140,7 +140,6 @@ export class TemplateRegistrationComponent implements OnInit {
           dateOfBirth: data.dateOfBirth,
           address: data.address,
           empId: ''
-
         };
 
         this.form.setValue(this.employee);
